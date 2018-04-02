@@ -1,5 +1,5 @@
 from __future__ import print_function
-from models import ConvFrontend
+from models import ConvFrontend, ResNetBBC
 import preprocess
 import pylab
 import numpy as np
@@ -13,5 +13,8 @@ vidframes = preprocess.load_video(filename)
 temporalvolume = preprocess.bbc(vidframes)
 
 frontend = ConvFrontend()
+resnet = ResNetBBC()
 
-output = frontend(Variable(temporalvolume))
+output = resnet(frontend(Variable(temporalvolume)))
+
+print(output.size())
