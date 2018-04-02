@@ -211,7 +211,7 @@ def resnet152(pretrained=False, **kwargs):
 class ResNetBBC(nn.Module):
     def __init__(self):
         super(ResNetBBC, self).__init__()
-        self.resnetModel = resnet34(True)
+        self.resnetModel = resnet34(False, num_classes=512)
 
     def forward(self, input):
         print(input.size())
@@ -223,5 +223,7 @@ class ResNetBBC(nn.Module):
         print(view.size())
 
         output = self.resnetModel(view)
+
+        #output = output.view(1, 29, 256)
 
         return output
