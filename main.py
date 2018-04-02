@@ -1,5 +1,5 @@
 from __future__ import print_function
-from models import ConvFrontend, ResNetBBC
+from models import ConvFrontend, ResNetBBC, LSTMBackend
 import preprocess
 import pylab
 import numpy as np
@@ -14,7 +14,8 @@ temporalvolume = preprocess.bbc(vidframes)
 
 frontend = ConvFrontend()
 resnet = ResNetBBC()
+lstm = LSTMBackend()
 
-output = resnet(frontend(Variable(temporalvolume)))
+output = lstm(resnet(frontend(Variable(temporalvolume))))
 
 print(output.size())

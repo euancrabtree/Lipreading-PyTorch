@@ -109,6 +109,7 @@ class ResNet(nn.Module):
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
         self.avgpool = nn.AvgPool2d(4, stride=1)
         self.fc = nn.Linear(512 * block.expansion, num_classes)
+        self.bn2 = nn.BatchNorm2d(num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -145,6 +146,7 @@ class ResNet(nn.Module):
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
         x = self.fc(x)
+        x = self.bn2(x)
 
         return x
 
@@ -211,7 +213,7 @@ def resnet152(pretrained=False, **kwargs):
 class ResNetBBC(nn.Module):
     def __init__(self):
         super(ResNetBBC, self).__init__()
-        self.resnetModel = resnet34(False, num_classes=512)
+        self.resnetModel = resnet34(False, num_classes=256)
 
     def forward(self, input):
         print(input.size())
@@ -224,6 +226,7 @@ class ResNetBBC(nn.Module):
 
         output = self.resnetModel(view)
 
-        #output = output.view(1, 29, 256)
+        output = output.view(1, -1, 256)
+        print(output.size())
 
         return output
