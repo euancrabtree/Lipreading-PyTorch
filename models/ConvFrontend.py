@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.nn.init as init
 
+
 class ConvFrontend(nn.Module):
     def __init__(self):
         super(ConvFrontend, self).__init__()
@@ -11,8 +12,6 @@ class ConvFrontend(nn.Module):
         self.pool = nn.MaxPool3d((1,3,3),stride=(1,2,2),padding=(0,1,1))
 
     def forward(self, input):
-        print(input.size())
         #return self.conv(input)
         output = self.pool(F.relu(self.norm(self.conv(input))))
-        print(output.size())
         return output

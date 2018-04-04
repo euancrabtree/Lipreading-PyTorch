@@ -142,7 +142,7 @@ class ResNet(nn.Module):
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
         self.avgpool = nn.AvgPool2d(4, stride=1)
         self.fc = nn.Linear(512 * block.expansion, num_classes)
-        self.bn2 = nn.BatchNorm2d(num_classes)
+        self.bn2 = nn.BatchNorm1d(num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -179,6 +179,7 @@ class ResNet(nn.Module):
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
         x = self.fc(x)
+        print(x.size())
         x = self.bn2(x)
 
         return x
@@ -249,17 +250,13 @@ class ResNetBBC(nn.Module):
         self.resnetModel = resnet34(False, num_classes=256)
 
     def forward(self, input):
-        print(input.size())
 
         transposed = input.transpose(1, 2).contiguous()
-        print(transposed.size())
 
         view = transposed.view(-1, 64, 28, 28)
-        print(view.size())
 
         output = self.resnetModel(view)
 
         output = output.view(1, -1, 256)
-        print(output.size())
 
         return output

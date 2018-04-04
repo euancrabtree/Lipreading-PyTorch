@@ -6,6 +6,7 @@ from torch.autograd import Variable
 from .ConvFrontend import ConvFrontend
 from .ResNetBBC import ResNetBBC
 from .LSTMBackend import LSTMBackend
+from .ConvBackend import ConvBackend
 
 class LipRead(nn.Module):
     def __init__(self):
@@ -13,8 +14,9 @@ class LipRead(nn.Module):
         self.frontend = ConvFrontend()
         self.resnet = ResNetBBC()
         self.lstm = LSTMBackend()
+        self.convbackend = ConvBackend()
 
     def forward(self, input):
-        output = self.lstm(self.resnet(self.frontend(Variable(input))))
+        output = self.lstm(self.resnet(self.frontend(input)))
 
         return output

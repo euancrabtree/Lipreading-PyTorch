@@ -15,9 +15,9 @@ class LSTMBackend(nn.Module):
 
         lstmOutput, _ = self.Module1(input)
 
-        print((lstmOutput[:, -1, :]).size())
-
         output = self.fc(lstmOutput[:, -1, :])
         output = self.softmax(output)
+
+        print(output.size())
 
         return output

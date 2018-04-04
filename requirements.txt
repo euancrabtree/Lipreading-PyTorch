@@ -1,5 +1,5 @@
 imageio==2.3
-http://download.pytorch.org/whl/cpu/torch-0.3.1-cp35-cp35m-linux_x86_64.whl 
+http://download.pytorch.org/whl/cu80/torch-0.3.1-cp35-cp35m-linux_x86_64.whl 
 torchvision
 numpy
 scipy
