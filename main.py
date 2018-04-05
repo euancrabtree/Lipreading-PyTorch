@@ -1,13 +1,10 @@
 from __future__ import print_function
 from models import LipRead
 import preprocess
-import pylab
-import numpy as np
 import torch.nn as nn
 from torch.autograd import Variable
 import torch
 import torch.optim as optim
-import gc
 
 #load video into a tensor
 filename = 'AFTERNOON.mp4'
@@ -26,7 +23,7 @@ criterion = nn.NLLLoss().cuda()
 optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
 
-for i in range(0,100):
+for i in range(0,1000):
     optimizer.zero_grad()
     outputs = model(input)
     _, predicted = torch.max(outputs.data, 1)
@@ -37,4 +34,3 @@ for i in range(0,100):
     optimizer.step()
 
     del outputs
-    gc.collect()
