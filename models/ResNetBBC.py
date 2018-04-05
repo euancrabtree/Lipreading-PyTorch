@@ -179,7 +179,6 @@ class ResNet(nn.Module):
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
         x = self.fc(x)
-        print(x.size())
         x = self.bn2(x)
 
         return x
@@ -257,6 +256,6 @@ class ResNetBBC(nn.Module):
 
         output = self.resnetModel(view)
 
-        output = output.view(1, -1, 256)
+        output = output.view(10, -1, 256)
 
         return output

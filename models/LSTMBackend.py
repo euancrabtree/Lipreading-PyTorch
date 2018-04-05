@@ -18,6 +18,4 @@ class LSTMBackend(nn.Module):
         output = self.fc(lstmOutput[:, -1, :])
         output = self.softmax(output)
 
-        print(output.size())
-
         return output

@@ -17,6 +17,6 @@ class LipRead(nn.Module):
         self.convbackend = ConvBackend()
 
     def forward(self, input):
-        output = self.lstm(self.resnet(self.frontend(input)))
+        output = self.convbackend(self.resnet(self.frontend(input)))
 
         return output
