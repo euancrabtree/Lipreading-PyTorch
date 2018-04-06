@@ -1,25 +1,20 @@
 from __future__ import print_function
 from models import LipRead
-import preprocess
 import torch.nn as nn
 from torch.autograd import Variable
 import torch
 import torch.optim as optim
 import time
+from data import LipreadingDataset
+from torch.utils.data import DataLoader
 import re
+import os
 
-#load video into a tensor
-filename = 'AFTERNOON.mp4'
 torch.backends.cudnn.benchmark = True
-
-vidframes = preprocess.load_video(filename)
-temporalvolume = preprocess.bbc(vidframes)
-
-labels = Variable(torch.LongTensor([42, 42, 42, 42, 42, 42, 42, 42, 42, 42]).cuda())
-input = Variable(temporalvolume.cuda())
 
 #Create the model on the GPU.
 model = LipRead().cuda()
+#model = nn.DataParallel(model,device_ids=[0])
 
 #function to initialize the weights and biases of each module. Matches the
 #classname with a regular expression to determine the type of the module, then
@@ -37,28 +32,36 @@ def weights_init(m):
 #Apply weight initialization to every module in the model.
 model.apply(weights_init)
 
+dataset = LipreadingDataset(0, 0)
+dataloader = DataLoader(dataset, batch_size=10,
+                        shuffle=True, num_workers=10)
+
 criterion = nn.NLLLoss().cuda()
 optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
 startTime = time.time()
 
 def output_iteration(i, prediction, time):
-    print("Iteration: {} \n Prediction: {} \n Time: {} \n".format(i, prediction, time))
+    os.system('clear')
+
+    print(time.__class__.__name__)
+    avgBatchTime = time / (i+1)
+    estTime = avgBatchTime * (len(dataset) - i)
+    print("Iteration: {}\nElapsed Time: {} \nEstimated Time Remaining: {}".format(i, time, estTime))
 
 print("Starting training...")
-for i in range(0,101):
+for i_batch, sample_batched in enumerate(dataloader):
     optimizer.zero_grad()
+    input = Variable(sample_batched['temporalvolume'].cuda())
+    labels = Variable(sample_batched['label'].cuda())
     outputs = model(input)
-    _, predicted = torch.max(outputs.data, 1)
 
-    loss = criterion(outputs, labels)
+
+    loss = criterion(outputs, labels.squeeze(1))
     loss.backward()
     optimizer.step()
 
-    torch.cuda.synchronize()
-    if(i % 100 == 0):
+    if((i_batch * 10) % 100 == 0):
+        _, predicted = torch.max(outputs.data, 1)
         currentTime = time.time()
-        output_iteration(i, predicted[0], currentTime - startTime)
-
-
-    del outputs
+        output_iteration(i_batch * 10, predicted[0], currentTime - startTime)

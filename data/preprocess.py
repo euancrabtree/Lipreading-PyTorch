@@ -38,8 +38,7 @@ def bbc(vidframes):
         FloatTensor: The video as a temporal volume, represented as a 5D tensor
             (batch, channel, time, width, height)"""
 
-    batchSize = 10
-    temporalvolume = torch.FloatTensor(batchSize,1,29,112,112)
+    temporalvolume = torch.FloatTensor(1,29,112,112)
 
     for i in range(0, 29):
         result = transforms.Compose([
@@ -50,9 +49,6 @@ def bbc(vidframes):
             transforms.Normalize([0.4161,],[0.1688,]),
         ])(vidframes[i])
 
-        temporalvolume[0][0][i] = result
-
-    for i in range(1, batchSize):
-        temporalvolume[i][0] = temporalvolume[0][0]
+        temporalvolume[0][i] = result
 
     return temporalvolume
