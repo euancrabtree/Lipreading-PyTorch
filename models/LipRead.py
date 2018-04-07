@@ -11,12 +11,15 @@ from .LSTMBackend import LSTMBackend
 from .ConvBackend import ConvBackend
 
 class LipRead(nn.Module):
-    def __init__(self):
+    def __init__(self, options):
         super(LipRead, self).__init__()
         self.frontend = ConvFrontend()
-        self.resnet = ResNetBBC()
-        self.lstm = LSTMBackend()
-        self.convbackend = ConvBackend()
+        self.resnet = ResNetBBC(options)
+        if(options["model"]["type"] == "temp-conv"):
+            self.backend = ConvBackend(options)
+
+        if(options["model"]["type"] == "LSTM" or options["model"]["type"] == "LSTM-init"):
+            self.backend = LSTMBackend(options)
 
         #function to initialize the weights and biases of each module. Matches the
         #classname with a regular expression to determine the type of the module, then
@@ -35,6 +38,9 @@ class LipRead(nn.Module):
         self.apply(weights_init)
 
     def forward(self, input):
-        output = self.convbackend(self.resnet(self.frontend(input)))
+        output = self.backend(self.resnet(self.frontend(input)))
 
         return output
+
+    def loss(self):
+        return self.backend.loss

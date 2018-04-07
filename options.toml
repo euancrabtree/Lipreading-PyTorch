@@ -1,0 +1,24 @@
+title = "TOML Example"
+
+[general]
+usecudnn = true
+usecudnnbenchmark = true
+usemultigpu = false
+gpuids = [1, 2]
+
+[input]
+batchsize = 10
+numworkers = 10
+shuffle = true
+
+[model]
+type = "temp-conv"
+inputdim = 256
+hiddendim = 256
+numclasses = 500
+numlstms = 2
+
+[training]
+epochs = 50
+startepoch = 10
+statsfrequency = 100

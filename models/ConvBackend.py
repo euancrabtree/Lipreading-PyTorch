@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class ConvBackend(nn.Module):
-    def __init__(self):
+    def __init__(self, options):
         super(ConvBackend, self).__init__()
 
         bn_size = 256
@@ -18,8 +18,7 @@ class ConvBackend(nn.Module):
         self.norm3 = nn.BatchNorm1d(bn_size)
         self.linear2 = nn.Linear(bn_size, 500)
 
-
-
+        self.loss = nn.CrossEntropyLoss()
 
     def forward(self, input):
         transposed = input.transpose(1, 2).contiguous()

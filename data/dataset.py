@@ -2,7 +2,7 @@ from torch.utils.data import Dataset
 from .preprocess import *
 
 class LipreadingDataset(Dataset):
-    """Face Landmarks dataset."""
+    """BBC Lip Reading dataset."""
 
     def __init__(self, csv_file, root_dir):
         """

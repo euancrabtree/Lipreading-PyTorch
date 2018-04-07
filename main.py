@@ -4,48 +4,78 @@ import torch.nn as nn
 from torch.autograd import Variable
 import torch
 import torch.optim as optim
-import time
+from datetime import datetime, timedelta
 from data import LipreadingDataset
 from torch.utils.data import DataLoader
 import re
 import os
+import toml
 
-torch.backends.cudnn.benchmark = True
+print("Loading options...")
+with open('options.toml', 'r') as optionsFile:
+    options = toml.loads(optionsFile.read())
 
-#Create the model on the GPU.
-model = LipRead().cuda()
-#model = nn.DataParallel(model,device_ids=[0])
+if(options["general"]["usecudnnbenchmark"] and options["general"]["usecudnn"]):
+    print("Running cudnn benchmark...")
+    torch.backends.cudnn.benchmark = True
 
+#Create the model.
+model = LipRead(options)
+
+#load the dataset.
 dataset = LipreadingDataset(0, 0)
-dataloader = DataLoader(dataset, batch_size=10,
-                        shuffle=True, num_workers=10)
+dataloader = DataLoader(dataset, batch_size=options["input"]["batchsize"],
+                        shuffle=options["input"]["shuffle"],
+                        num_workers=options["input"]["numworkers"])
 
-criterion = nn.NLLLoss().cuda()
+
+#set up the loss function.
+#criterion = nn.NLLLoss().cuda()
+criterion = model.loss()
 optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
-startTime = time.time()
+#transfer the model to the GPU.
+if(options["general"]["usecudnn"]):
+    model = model.cuda()
+    criterion = criterion.cuda()
 
-def output_iteration(i, prediction, time):
+
+startTime = datetime.now()
+
+def timedelta_string(timedelta):
+    totalSeconds = int(timedelta.total_seconds())
+    hours, remainder = divmod(totalSeconds,60*60)
+    minutes, seconds = divmod(remainder,60)
+    return "{} hrs, {} mins, {} secs".format(hours, minutes, seconds)
+
+def output_iteration(i, time):
     os.system('clear')
 
-    print(time.__class__.__name__)
     avgBatchTime = time / (i+1)
     estTime = avgBatchTime * (len(dataset) - i)
-    print("Iteration: {}\nElapsed Time: {} \nEstimated Time Remaining: {}".format(i, time, estTime))
+
+    print("Iteration: {}\nElapsed Time: {} \nEstimated Time Remaining: {}".format(i, timedelta_string(time), timedelta_string(estTime)))
 
 print("Starting training...")
-for i_batch, sample_batched in enumerate(dataloader):
-    optimizer.zero_grad()
-    input = Variable(sample_batched['temporalvolume'].cuda())
-    labels = Variable(sample_batched['label'].cuda())
-    outputs = model(input)
 
+for i in range(0, options["training"]["epochs"]):
+    for i_batch, sample_batched in enumerate(dataloader):
+        optimizer.zero_grad()
+        input = Variable(sample_batched['temporalvolume'])
+        labels = Variable(sample_batched['label'])
 
-    loss = criterion(outputs, labels.squeeze(1))
-    loss.backward()
-    optimizer.step()
+        if(options["general"]["usecudnn"]):
+            input = input.cuda()
+            labels = labels.cuda()
 
-    if((i_batch * 10) % 100 == 0):
-        _, predicted = torch.max(outputs.data, 1)
-        currentTime = time.time()
-        output_iteration(i_batch * 10, predicted[0], currentTime - startTime)
+        outputs = model(input)
+        loss = criterion(outputs, labels.squeeze(1))
+
+        loss.backward()
+        optimizer.step()
+        sampleNumber = i_batch * options["input"]["batchsize"]
+
+        if(sampleNumber % options["training"]["statsfrequency"] == 0):
+            #_, predicted = torch.max(outputs.data, 2)
+            currentTime = datetime.now()
+            output_iteration(sampleNumber, currentTime - startTime)

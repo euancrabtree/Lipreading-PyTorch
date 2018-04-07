@@ -1,4 +1,4 @@
-# Adapted from TorchVision's ResNet to use the custom frontend and backend.
+# Adapted from TorchVision's ResNet to use a custom frontend and backend.
 # https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
 #
 # BSD 3-Clause License
@@ -244,9 +244,12 @@ def resnet152(pretrained=False, **kwargs):
     return model
 
 class ResNetBBC(nn.Module):
-    def __init__(self):
+    def __init__(self, options):
         super(ResNetBBC, self).__init__()
-        self.resnetModel = resnet34(False, num_classes=256)
+        self.inputdims = options["model"]["inputdim"]
+        self.batchsize = options["input"]["batchsize"]
+
+        self.resnetModel = resnet34(False, num_classes=self.inputdims)
 
     def forward(self, input):
 
@@ -256,6 +259,6 @@ class ResNetBBC(nn.Module):
 
         output = self.resnetModel(view)
 
-        output = output.view(10, -1, 256)
+        output = output.view(self.batchsize, -1, 256)
 
         return output
