@@ -4,6 +4,10 @@ import torch.nn.functional as F
 from torch.autograd import Function
 
 class NLLSequenceLoss(nn.Module):
+    """
+    Custom loss function.
+    Returns a loss that is the sum of all losses at each time step. 
+    """
     def __init__(self):
         super(NLLSequenceLoss, self).__init__()
         self.criterion = nn.NLLLoss()
