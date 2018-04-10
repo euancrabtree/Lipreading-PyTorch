@@ -5,10 +5,11 @@ usecudnn = true
 usecudnnbenchmark = true
 usemultigpu = false
 gpuids = [1, 2]
+loadsaved = false
 
 [input]
-batchsize = 10
-numworkers = 10
+batchsize = 12
+numworkers = 12
 shuffle = true
 
 [model]
@@ -19,6 +20,6 @@ numclasses = 500
 numlstms = 2
 
 [training]
-epochs = 50
-startepoch = 10
+epochs = 10
+startepoch = 0
 statsfrequency = 100

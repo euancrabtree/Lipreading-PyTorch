@@ -1,4 +1,7 @@
 import imageio
+
+imageio.plugins.ffmpeg.download()
+
 import torchvision.transforms.functional as functional
 import torchvision.transforms as transforms
 import torch
@@ -13,9 +16,6 @@ def load_video(filename):
     Returns:
         List[FloatTensor]: the frames of the video as a list of 3D tensors
             (channels, width, height)"""
-
-    #Download ffmpeg using imageio, just in case it isn't installed
-    imageio.plugins.ffmpeg.download()
 
     vid = imageio.get_reader(filename,  'ffmpeg')
     frames = []

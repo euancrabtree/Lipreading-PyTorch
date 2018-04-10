@@ -20,8 +20,15 @@ if(options["general"]["usecudnnbenchmark"] and options["general"]["usecudnn"]):
 
 
 #load the dataset.
-dataset = LipreadingDataset(0, 0)
-dataloader = DataLoader(dataset, batch_size=options["input"]["batchsize"],
+trainingdataset = LipreadingDataset("/udisk/pszts-ssd/AV-ASR-data/BBC_Oxford/lipread_mp4",
+                            "train")
+trainingdataloader = DataLoader(trainingdataset, batch_size=options["input"]["batchsize"],
+                        shuffle=options["input"]["shuffle"],
+                        num_workers=options["input"]["numworkers"])
+
+validationdataset = LipreadingDataset("/udisk/pszts-ssd/AV-ASR-data/BBC_Oxford/lipread_mp4",
+                            "val")
+validationdataloader = DataLoader(trainingdataset, batch_size=options["input"]["batchsize"],
                         shuffle=options["input"]["shuffle"],
                         num_workers=options["input"]["numworkers"])
 
@@ -51,14 +58,14 @@ def output_iteration(i, time):
     os.system('clear')
 
     avgBatchTime = time / (i+1)
-    estTime = avgBatchTime * (len(dataset) - i)
+    estTime = avgBatchTime * (len(trainingdataset) - i)
 
     print("Iteration: {}\nElapsed Time: {} \nEstimated Time Remaining: {}".format(i, timedelta_string(time), timedelta_string(estTime)))
 
 print("Starting training...")
 
-for i in range(0, options["training"]["epochs"]):
-    for i_batch, sample_batched in enumerate(dataloader):
+for epoch in range(0, options["training"]["epochs"]):
+    for i_batch, sample_batched in enumerate(trainingdataloader):
         optimizer.zero_grad()
         input = Variable(sample_batched['temporalvolume'])
         labels = Variable(sample_batched['label'])
@@ -75,8 +82,33 @@ for i in range(0, options["training"]["epochs"]):
         sampleNumber = i_batch * options["input"]["batchsize"]
 
         if(sampleNumber % options["training"]["statsfrequency"] == 0):
-            #_, predicted = torch.max(outputs.data, 2)
+            count = 0
             currentTime = datetime.now()
             output_iteration(sampleNumber, currentTime - startTime)
 
-    print("Starting testing...")
+    print("Epoch completed, saving state...")
+    torch.save(model.state_dict(), "trainedmodel.pt")
+
+    print("Starting validation...")
+    count = 0
+    for i_batch, sample_batched in enumerate(validationdataloader):
+        optimizer.zero_grad()
+        input = Variable(sample_batched['temporalvolume'])
+        labels = sample_batched['label']
+
+        if(options["general"]["usecudnn"]):
+            input = input.cuda()
+            labels = labels.cuda()
+
+        outputs = model(input)
+        sampleNumber = i_batch * options["input"]["batchsize"]
+
+        maxvalues, maxindices = torch.max(outputs.data, 1)
+
+        for i in range(0, labels.squeeze(1).size(0)):
+            if maxindices[i] == labels.squeeze(1)[i]:
+                count += 1
+
+    accuracy = len(validationdataset) / count
+    with open("accuracy.txt", "a") as outputfile:
+        outputfile.write("Epoch {} accuracy: {}".format(epoch, accuracy ))
