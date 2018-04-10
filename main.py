@@ -1,6 +1,5 @@
 from __future__ import print_function
 from models import LipRead
-import torch.nn as nn
 from torch.autograd import Variable
 import torch
 import torch.optim as optim
@@ -19,8 +18,6 @@ if(options["general"]["usecudnnbenchmark"] and options["general"]["usecudnn"]):
     print("Running cudnn benchmark...")
     torch.backends.cudnn.benchmark = True
 
-#Create the model.
-model = LipRead(options)
 
 #load the dataset.
 dataset = LipreadingDataset(0, 0)
@@ -28,9 +25,11 @@ dataloader = DataLoader(dataset, batch_size=options["input"]["batchsize"],
                         shuffle=options["input"]["shuffle"],
                         num_workers=options["input"]["numworkers"])
 
+#Create the model.
+model = LipRead(options)
+
 
 #set up the loss function.
-#criterion = nn.NLLLoss().cuda()
 criterion = model.loss()
 optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
@@ -79,3 +78,5 @@ for i in range(0, options["training"]["epochs"]):
             #_, predicted = torch.max(outputs.data, 2)
             currentTime = datetime.now()
             output_iteration(sampleNumber, currentTime - startTime)
+
+    print("Starting testing...")
