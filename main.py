@@ -10,6 +10,8 @@ import re
 import os
 import toml
 
+gpuid = 2
+
 print("Loading options...")
 with open('options.toml', 'r') as optionsFile:
     options = toml.loads(optionsFile.read())
@@ -24,17 +26,20 @@ trainingdataset = LipreadingDataset("/udisk/pszts-ssd/AV-ASR-data/BBC_Oxford/lip
                             "train")
 trainingdataloader = DataLoader(trainingdataset, batch_size=options["input"]["batchsize"],
                         shuffle=options["input"]["shuffle"],
-                        num_workers=options["input"]["numworkers"])
+                        num_workers=options["input"]["numworkers"],
+                        drop_last=True)
 
 validationdataset = LipreadingDataset("/udisk/pszts-ssd/AV-ASR-data/BBC_Oxford/lipread_mp4",
                             "val")
-validationdataloader = DataLoader(trainingdataset, batch_size=options["input"]["batchsize"],
+validationdataloader = DataLoader(validationdataset, batch_size=options["input"]["batchsize"],
                         shuffle=options["input"]["shuffle"],
-                        num_workers=options["input"]["numworkers"])
+                        num_workers=options["input"]["numworkers"],
+                        drop_last=True)
 
 #Create the model.
 model = LipRead(options)
 
+model.load_state_dict(torch.load('updatedDict.pt'))
 
 #set up the loss function.
 criterion = model.loss()
@@ -42,8 +47,8 @@ optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
 #transfer the model to the GPU.
 if(options["general"]["usecudnn"]):
-    model = model.cuda()
-    criterion = criterion.cuda()
+    model = model.cuda(gpuid)
+    criterion = criterion.cuda(gpuid)
 
 
 startTime = datetime.now()
@@ -62,53 +67,54 @@ def output_iteration(i, time):
 
     print("Iteration: {}\nElapsed Time: {} \nEstimated Time Remaining: {}".format(i, timedelta_string(time), timedelta_string(estTime)))
 
-print("Starting training...")
+for epoch in range(options["training"]["startepoch"], options["training"]["epochs"]):
 
-for epoch in range(0, options["training"]["epochs"]):
-    for i_batch, sample_batched in enumerate(trainingdataloader):
-        optimizer.zero_grad()
-        input = Variable(sample_batched['temporalvolume'])
-        labels = Variable(sample_batched['label'])
+    if(options["training"]["train"]):
+        print("Starting training...")
+        for i_batch, sample_batched in enumerate(trainingdataloader):
+            optimizer.zero_grad()
+            input = Variable(sample_batched['temporalvolume'])
+            labels = Variable(sample_batched['label'])
 
-        if(options["general"]["usecudnn"]):
-            input = input.cuda()
-            labels = labels.cuda()
+            if(options["general"]["usecudnn"]):
+                input = input.cuda(gpuid)
+                labels = labels.cuda(gpuid)
 
-        outputs = model(input)
-        loss = criterion(outputs, labels.squeeze(1))
+            outputs = model(input)
+            loss = criterion(outputs, labels.squeeze(1))
 
-        loss.backward()
-        optimizer.step()
-        sampleNumber = i_batch * options["input"]["batchsize"]
+            loss.backward()
+            optimizer.step()
+            sampleNumber = i_batch * options["input"]["batchsize"]
 
-        if(sampleNumber % options["training"]["statsfrequency"] == 0):
-            count = 0
-            currentTime = datetime.now()
-            output_iteration(sampleNumber, currentTime - startTime)
+            if(sampleNumber % options["training"]["statsfrequency"] == 0):
+                currentTime = datetime.now()
+                output_iteration(sampleNumber, currentTime - startTime)
 
-    print("Epoch completed, saving state...")
-    torch.save(model.state_dict(), "trainedmodel.pt")
+        print("Epoch completed, saving state...")
+        torch.save(model.state_dict(), "trainedmodel.pt")
 
     print("Starting validation...")
     count = 0
+    validator = model.validator()
     for i_batch, sample_batched in enumerate(validationdataloader):
         optimizer.zero_grad()
         input = Variable(sample_batched['temporalvolume'])
         labels = sample_batched['label']
 
         if(options["general"]["usecudnn"]):
-            input = input.cuda()
-            labels = labels.cuda()
+            input = input.cuda(gpuid)
+            labels = labels.cuda(gpuid)
 
         outputs = model(input)
+
+        count += validator(outputs, labels)
+
         sampleNumber = i_batch * options["input"]["batchsize"]
 
-        maxvalues, maxindices = torch.max(outputs.data, 1)
+        if(sampleNumber % options["training"]["statsfrequency"] == 0):
+            print(count)
 
-        for i in range(0, labels.squeeze(1).size(0)):
-            if maxindices[i] == labels.squeeze(1)[i]:
-                count += 1
-
-    accuracy = len(validationdataset) / count
+    accuracy = count / len(validationdataset)
     with open("accuracy.txt", "a") as outputfile:
-        outputfile.write("Epoch {} accuracy: {}".format(epoch, accuracy ))
+        outputfile.write("\nEpoch: {}, correct count: {}, total count: {} accuracy: {}" .format(epoch, count, len(validationdataset), accuracy ))

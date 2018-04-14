@@ -15,11 +15,21 @@ class LipRead(nn.Module):
         super(LipRead, self).__init__()
         self.frontend = ConvFrontend()
         self.resnet = ResNetBBC(options)
-        if(options["model"]["type"] == "temp-conv"):
-            self.backend = ConvBackend(options)
+        self.backend = ConvBackend(options)
+        self.lstm = LSTMBackend(options)
 
-        if(options["model"]["type"] == "LSTM" or options["model"]["type"] == "LSTM-init"):
-            self.backend = LSTMBackend(options)
+        self.type = options["model"]["type"]
+
+        def freeze(m):
+            m.requires_grad=False
+
+        if(options["model"]["type"] == "LSTM-init"):
+            self.frontend.apply(freeze)
+            self.resnet.apply(freeze)
+
+
+        self.frontend.apply(freeze)
+        self.resnet.apply(freeze)
 
         #function to initialize the weights and biases of each module. Matches the
         #classname with a regular expression to determine the type of the module, then
@@ -38,9 +48,24 @@ class LipRead(nn.Module):
         self.apply(weights_init)
 
     def forward(self, input):
-        output = self.backend(self.resnet(self.frontend(input)))
+        if(self.type == "temp-conv"):
+            output = self.backend(self.resnet(self.frontend(input)))
+
+        if(self.type == "LSTM" or self.type == "LSTM-init"):
+            output = self.lstm(self.resnet(self.frontend(input)))
 
         return output
 
     def loss(self):
-        return self.backend.loss
+        if(self.type == "temp-conv"):
+            return self.backend.loss
+
+        if(self.type == "LSTM" or self.type == "LSTM-init"):
+            return self.lstm.loss
+
+    def validator(self):
+        if(self.type == "temp-conv"):
+            return self.backend.validator
+
+        if(self.type == "LSTM" or self.type == "LSTM-init"):
+            return self.lstm.validator

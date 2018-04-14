@@ -1,1 +1,12 @@
-Epoch 0 accuracy: 1.0
+
+Epoch: 0, correct count: 153462, total count: 25000 accuracy: 0.1629067782252284
+Epoch: 0, correct count: 11708, total count: 25000 accuracy: 2.135292107960369
+Epoch: 1, correct count: 13297, total count: 25000 accuracy: 0.53188
+Epoch: 2, correct count: 14048, total count: 25000 accuracy: 0.56192
+Epoch: 3, correct count: 14494, total count: 25000 accuracy: 0.57976
+Epoch: 4, correct count: 14905, total count: 25000 accuracy: 0.5962
+Epoch: 5, correct count: 15231, total count: 25000 accuracy: 0.60924
+Epoch: 6, correct count: 15498, total count: 25000 accuracy: 0.61992
+Epoch: 7, correct count: 14709, total count: 25000 accuracy: 0.58836
+Epoch: 7, correct count: 15422, total count: 25000 accuracy: 0.61688
+Epoch: 7, correct count: 16592, total count: 25000 accuracy: 0.66368

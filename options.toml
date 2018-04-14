@@ -13,13 +13,16 @@ numworkers = 12
 shuffle = true
 
 [model]
-type = "temp-conv"
+type = "LSTM-init"
 inputdim = 256
 hiddendim = 256
 numclasses = 500
 numlstms = 2
 
+
 [training]
+train = true
+validate = true
 epochs = 10
-startepoch = 0
-statsfrequency = 100
+startepoch = 7
+statsfrequency = 1000

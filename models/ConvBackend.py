@@ -2,6 +2,18 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+def _validate(modelOutput, labels):
+    maxvalues, maxindices = torch.max(modelOutput.data, 1)
+
+    count = 0
+
+    for i in range(0, labels.squeeze(1).size(0)):
+
+        if maxindices[i] == labels.squeeze(1)[i]:
+            count += 1
+
+    return count
+
 class ConvBackend(nn.Module):
     def __init__(self, options):
         super(ConvBackend, self).__init__()
@@ -19,6 +31,8 @@ class ConvBackend(nn.Module):
         self.linear2 = nn.Linear(bn_size, 500)
 
         self.loss = nn.CrossEntropyLoss()
+
+        self.validator = _validate
 
     def forward(self, input):
         transposed = input.transpose(1, 2).contiguous()
