@@ -23,7 +23,7 @@ numlstms = 2
 
 
 [training]
-train = false
+train = true
 epochs = 12
 startepoch = 10
 statsfrequency = 1000

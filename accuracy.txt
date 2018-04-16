@@ -13,4 +13,9 @@ Epoch: 7, correct count: 16592, total count: 25000 accuracy: 0.66368
 Epoch: 8, correct count: 17679, total count: 25000 accuracy: 0.70716
 Epoch: 9, correct count: 18499, total count: 25000 accuracy: 0.73996
 Epoch: 10, correct count: 18977, total count: 25000 accuracy: 0.75908
-Epoch: 11, correct count: 18967, total count: 25000 accuracy: 0.75868
+Epoch: 11, correct count: 18967, total count: 25000 accuracy: 0.75868\correct count: 0, total count: 10 accuracy: 0.0\correct count: 0, total count: 10 accuracy: 0.0
+correct count: 0, total count: 10 accuracy: 0.0
+correct count: 0, total count: 10 accuracy: 0.0
+correct count: 764, total count: 1000 accuracy: 0.764
+correct count: 778, total count: 1000 accuracy: 0.778
+correct count: 746, total count: 1000 accuracy: 0.746

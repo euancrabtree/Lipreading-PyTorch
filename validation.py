@@ -46,6 +46,6 @@ class Validator():
             print(count)
 
 
-        accuracy = count / len(validationdataset)
+        accuracy = count / len(self.validationdataset)
         with open("accuracy.txt", "a") as outputfile:
-            outputfile.write("\nEpoch: {}, correct count: {}, total count: {} accuracy: {}" .format(epoch, count, len(validationdataset), accuracy ))
+            outputfile.write("\ncorrect count: {}, total count: {} accuracy: {}" .format(count, len(self.validationdataset), accuracy ))

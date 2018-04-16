@@ -1,13 +1,6 @@
 from __future__ import print_function
 from models import LipRead
-from torch.autograd import Variable
 import torch
-import torch.optim as optim
-from datetime import datetime, timedelta
-from data import LipreadingDataset
-from torch.utils.data import DataLoader
-import re
-import os
 import toml
 from training import Trainer
 from validation import Validator
