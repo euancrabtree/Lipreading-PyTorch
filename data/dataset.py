@@ -34,8 +34,7 @@ class LipreadingDataset(Dataset):
         #self.root_dir = root_dir
 
     def __len__(self):
-        return 1000
-        #return len(self.file_list)
+        return len(self.file_list)
 
     def __getitem__(self, idx):
         #load video into a tensor
