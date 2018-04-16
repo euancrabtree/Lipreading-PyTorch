@@ -3,8 +3,8 @@ title = "TOML Example"
 [general]
 usecudnn = true
 usecudnnbenchmark = true
-gpuid = 0
-loadpretrainedmodel = false
+gpuid = 1
+loadpretrainedmodel = true
 pretrainedmodelpath = "epoch10.pt"
 savemodel = true
 modelsavepath = "savedmodel.pt"
@@ -23,13 +23,14 @@ numlstms = 2
 
 
 [training]
-train = true
+train = false
 epochs = 12
 startepoch = 10
 statsfrequency = 1000
 dataset = "/udisk/pszts-ssd/AV-ASR-data/BBC_Oxford/lipread_mp4"
 
 [validation]
+validate = true
 dataset = "/udisk/pszts-ssd/AV-ASR-data/BBC_Oxford/lipread_mp4"
 saveaccuracy = true
 accuracyfilelocation = "accuracy.txt"

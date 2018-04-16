@@ -63,7 +63,7 @@ class LipRead(nn.Module):
         if(self.type == "LSTM" or self.type == "LSTM-init"):
             return self.lstm.loss
 
-    def validator(self):
+    def validator_function(self):
         if(self.type == "temp-conv"):
             return self.backend.validator
 
