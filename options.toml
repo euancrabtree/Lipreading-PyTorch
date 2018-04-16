@@ -13,7 +13,7 @@ numworkers = 12
 shuffle = true
 
 [model]
-type = "LSTM-init"
+type = "LSTM"
 inputdim = 256
 hiddendim = 256
 numclasses = 500
@@ -23,6 +23,6 @@ numlstms = 2
 [training]
 train = true
 validate = true
-epochs = 10
-startepoch = 7
+epochs = 12
+startepoch = 10
 statsfrequency = 1000

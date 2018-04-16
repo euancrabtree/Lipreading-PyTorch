@@ -39,7 +39,7 @@ validationdataloader = DataLoader(validationdataset, batch_size=options["input"]
 #Create the model.
 model = LipRead(options)
 
-model.load_state_dict(torch.load('updatedDict.pt'))
+model.load_state_dict(torch.load('epoch9.pt'))
 
 #set up the loss function.
 criterion = model.loss()
