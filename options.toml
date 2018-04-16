@@ -21,13 +21,13 @@ hiddendim = 256
 numclasses = 500
 numlstms = 2
 
-
 [training]
 train = true
-epochs = 12
+epochs = 15
 startepoch = 10
 statsfrequency = 1000
 dataset = "/udisk/pszts-ssd/AV-ASR-data/BBC_Oxford/lipread_mp4"
+learningrate = 0.03
 
 [validation]
 validate = true

@@ -19,3 +19,4 @@ correct count: 0, total count: 10 accuracy: 0.0
 correct count: 764, total count: 1000 accuracy: 0.764
 correct count: 778, total count: 1000 accuracy: 0.778
 correct count: 746, total count: 1000 accuracy: 0.746
+correct count: 18965, total count: 25000 accuracy: 0.7586

@@ -23,7 +23,7 @@ class NLLSequenceLoss(nn.Module):
 
 def _validate(modelOutput, labels):
 
-    averageEnergies = torch.mean(modelOutput.data, 1)
+    averageEnergies = torch.sum(modelOutput.data, 1)
 
     maxvalues, maxindices = torch.max(averageEnergies, 1)
 

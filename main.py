@@ -29,7 +29,7 @@ validator = Validator(options)
 for epoch in range(options["training"]["startepoch"], options["training"]["epochs"]):
 
     if(options["training"]["train"]):
-        trainer.epoch(model)
+        trainer.epoch(model, epoch)
 
     if(options["validation"]["validate"]):
         validator.epoch(model)

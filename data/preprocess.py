@@ -5,6 +5,7 @@ imageio.plugins.ffmpeg.download()
 import torchvision.transforms.functional as functional
 import torchvision.transforms as transforms
 import torch
+from .statefultransforms import StatefulRandomCrop, StatefulRandomHorizontalFlip
 
 def load_video(filename):
     """Loads the specified video using ffmpeg.
@@ -25,7 +26,7 @@ def load_video(filename):
         frames.append(image)
     return frames
 
-def bbc(vidframes):
+def bbc(vidframes, augmentation=True):
     """Preprocesses the specified list of frames by center cropping.
     This will only work correctly on videos that are already centered on the
     mouth region, such as LRITW.
@@ -40,10 +41,22 @@ def bbc(vidframes):
 
     temporalvolume = torch.FloatTensor(1,29,112,112)
 
+    croptransform = transforms.CenterCrop((112, 112))
+
+    if(augmentation):
+        crop = StatefulRandomCrop((122, 122), (112, 112))
+        flip = StatefulRandomHorizontalFlip(0.5)
+
+        croptransform = transforms.Compose([
+            crop,
+            flip
+        ])
+
     for i in range(0, 29):
         result = transforms.Compose([
             transforms.ToPILImage(),
-            transforms.CenterCrop((112, 112)),
+            transforms.CenterCrop((122, 122)),
+            croptransform,
             transforms.Grayscale(num_output_channels=1),
             transforms.ToTensor(),
             transforms.Normalize([0.4161,],[0.1688,]),

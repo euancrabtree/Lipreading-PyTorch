@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from data import LipreadingDataset
 from torch.utils.data import DataLoader
 import os
+import math
 
 def timedelta_string(timedelta):
     totalSeconds = int(timedelta.total_seconds())
@@ -38,10 +39,18 @@ class Trainer():
 
         self.gpuid = options["general"]["gpuid"]
 
-    def epoch(self, model):
+        self.learningrate = options["training"]["learningrate"]
+
+        self.modelType = options["training"]["learningrate"]
+
+    def learningRate(self, epoch):
+        decay = math.floor((epoch - 1) / 5)
+        return self.learningrate * pow(0.5, decay)
+
+    def epoch(self, model, epoch):
         #set up the loss function.
         criterion = model.loss()
-        optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+        optimizer = optim.SGD(model.parameters(), self.learningRate(epoch), momentum=0.9)
 
         #transfer the model to the GPU.
         if(self.usecudnn):

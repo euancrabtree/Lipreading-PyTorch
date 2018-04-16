@@ -10,7 +10,7 @@ class Validator():
     def __init__(self, options):
 
         self.validationdataset = LipreadingDataset("/udisk/pszts-ssd/AV-ASR-data/BBC_Oxford/lipread_mp4",
-                                    "val")
+                                    "val", False)
         self.validationdataloader = DataLoader(
                                     self.validationdataset,
                                     batch_size=options["input"]["batchsize"],
