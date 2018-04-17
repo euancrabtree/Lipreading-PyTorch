@@ -10,12 +10,12 @@ savemodel = true
 modelsavepath = "savedmodel.pt"
 
 [input]
-batchsize = 12
-numworkers = 12
+batchsize = 18
+numworkers = 18
 shuffle = true
 
 [model]
-type = "LSTM"
+type = "LSTM-init"
 inputdim = 256
 hiddendim = 256
 numclasses = 500
@@ -27,7 +27,7 @@ epochs = 15
 startepoch = 10
 statsfrequency = 1000
 dataset = "/udisk/pszts-ssd/AV-ASR-data/BBC_Oxford/lipread_mp4"
-learningrate = 0.03
+learningrate = 0.003
 
 [validation]
 validate = true

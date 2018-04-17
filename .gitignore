@@ -102,3 +102,6 @@ ENV/
 
 #saved models
 *.pt
+
+#runtime output files
+accuracy.txt
