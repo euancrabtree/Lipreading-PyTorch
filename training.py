@@ -43,6 +43,9 @@ class Trainer():
 
         self.modelType = options["training"]["learningrate"]
 
+        self.weightdecay = options["training"]["weightdecay"]
+        self.momentum = options["training"]["momentum"]
+
     def learningRate(self, epoch):
         decay = math.floor((epoch - 1) / 5)
         return self.learningrate * pow(0.5, decay)
@@ -50,7 +53,11 @@ class Trainer():
     def epoch(self, model, epoch):
         #set up the loss function.
         criterion = model.loss()
-        optimizer = optim.SGD(model.parameters(), self.learningRate(epoch), momentum=0.9)
+        optimizer = optim.SGD(
+                        model.parameters(),
+                        lr = self.learningRate(epoch),
+                        momentum = self.learningrate,
+                        weight_decay = self.weightdecay)
 
         #transfer the model to the GPU.
         if(self.usecudnn):

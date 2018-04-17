@@ -5,7 +5,7 @@ usecudnn = true
 usecudnnbenchmark = true
 gpuid = 1
 loadpretrainedmodel = true
-pretrainedmodelpath = "epoch10.pt"
+pretrainedmodelpath = "trainedmodel.pt"
 savemodel = true
 modelsavepath = "savedmodel.pt"
 
@@ -15,7 +15,7 @@ numworkers = 18
 shuffle = true
 
 [model]
-type = "LSTM-init"
+type = "LSTM"
 inputdim = 256
 hiddendim = 256
 numclasses = 500
@@ -28,6 +28,8 @@ startepoch = 10
 statsfrequency = 1000
 dataset = "/udisk/pszts-ssd/AV-ASR-data/BBC_Oxford/lipread_mp4"
 learningrate = 0.003
+momentum = 0.9
+weightdecay = 0.0001
 
 [validation]
 validate = true
